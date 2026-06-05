@@ -1,0 +1,47 @@
+<div class="app-container">
+  <h1>{{ title }}</h1>
+  <p class="subtitle">System zarządzania kursami walut z API NBP</p>
+
+  <div class="control-panel">
+    <div class="form-group">
+      <label for="rate-date">Wybierz datę:</label>
+      <input type="date" id="rate-date" [(ngModel)]="selectedDate" class="date-input">
+    </div>
+
+    <div class="button-group">
+      <button (click)="fetchFromNbp()" class="btn btn-fetch">Pobierz z NBP i Zapisz</button>
+      <button (click)="filterByDate()" class="btn btn-filter">Pokaz z bazy dla daty</button>
+      <button (click)="loadAllCurrencies()" class="btn btn-all">Pokaż całą bazę</button>
+    </div>
+  </div>
+
+  <div *ngIf="message" [ngClass]="{'alert-error': isError, 'alert-success': !isError}" class="alert-box">
+    {{ message }}
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Kod waluty</th>
+          <th>Nazwa waluty</th>
+          <th>Kurs wymiany (PLN)</th>
+          <th>Data kursu</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of currencies">
+          <td>{{ item.id }}</td>
+          <td class="bold-code">{{ item.currency_code }}</td>
+          <td>{{ item.currency_name }}</td>
+          <td class="rate-val">{{ item.exchange_rate | number:'1.4-4' }}</td>
+          <td>{{ item.rate_date }}</td>
+        </tr>
+        <tr *ngIf="currencies.length === 0">
+          <td colspan="5" class="no-data">Brak danych do wyświetlenia. Wybierz datę i pobierz kursy.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
