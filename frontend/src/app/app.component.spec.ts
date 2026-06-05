@@ -4,16 +4,24 @@ import { CurrencyService } from './services/currency.service';
 import { FormsModule } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 
-describe('AppComponent (BDD Scenarios)', () => {
+describe('AppComponent', () => {
   let component: AppComponent;
   let fixture: ComponentFixture<AppComponent>;
   let mockCurrencyService: any;
 
   beforeEach(async () => {
-    mockCurrencyService = jasmine.createSpyObj(['getAvailableCurrencies', 'fetchAndSaveCurrencies']);
-    mockCurrencyService.getAvailableCurrencies.and.returnValue(of([
-      { id: 1, currency_code: 'USD', currency_name: 'dolar amerykański', exchange_rate: 4.0152, rate_date: '2026-06-01' },
-      { id: 2, currency_code: 'EUR', currency_name: 'euro', exchange_rate: 4.3210, rate_date: '2026-06-02' }
+    mockCurrencyService = jasmine.createSpyObj([
+      'getAvailableCurrencies', 
+      'getCurrenciesByDate', 
+      'getCurrenciesByMonth', 
+      'getCurrenciesByYear', 
+      'getCurrenciesByQuarter', 
+      'fetchAndSaveCurrencies'
+    ]);
+    
+    mockCurrencyService.getAvailableCurrencies.and.returnValue(of([]));
+    mockCurrencyService.getCurrenciesByDate.and.returnValue(of([
+      { id: 1, currency_code: 'USD', currency_name: 'dolar amerykański', exchange_rate: 4.0152, rate_date: '2026-06-01' }
     ]));
 
     await TestBed.configureTestingModule({
@@ -29,26 +37,50 @@ describe('AppComponent (BDD Scenarios)', () => {
     fixture.detectChanges();
   });
 
-  it('SHOULD display currencies in table WHEN component initializes (Given data exists)', () => {
-    component.ngOnInit();
+  it('should create the app', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should display currencies in table when data exists', () => {
+    component.activeTab = 'day';
+    component.selectedDate = '2026-06-01';
+    component.applyFilters();
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
     const tableRows = compiled.querySelectorAll('.table-row');
     
-    expect(component.filteredCurrencies.length).toBe(1); // dla domyślnej daty 2026-06-01 przefiltruje tylko USD
+    expect(component.filteredCurrencies.length).toBe(1);
     expect(tableRows.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('SHOULD call currency service WHEN click fetch button', () => {
+  it('should call currency service when click fetch button', () => {
     mockCurrencyService.fetchAndSaveCurrencies.and.returnValue(of({ status: 'Success' }));
     
     component.activeTab = 'day';
     component.selectedDate = '2026-06-01';
-    
     component.fetchAndLoad();
     
     expect(mockCurrencyService.fetchAndSaveCurrencies).toHaveBeenCalledWith('2026-06-01');
     expect(component.isError).toBeFalse();
+  });
+
+  it('should fetch monthly data when active tab is changed to month', () => {
+    mockCurrencyService.getCurrenciesByMonth.and.returnValue(of([]));
+    
+    component.setTab('month');
+    
+    expect(component.activeTab).toBe('month');
+    expect(mockCurrencyService.getCurrenciesByMonth).toHaveBeenCalledWith('2026', '06');
+  });
+
+  it('should display error message when API request fails', () => {
+    mockCurrencyService.getAvailableCurrencies.and.returnValue(throwError(() => new Error('API Error')));
+    
+    component.activeTab = 'all';
+    component.applyFilters();
+    
+    expect(component.isError).toBeTrue();
+    expect(component.message).toContain('Błąd podczas pobierania');
   });
 });
