@@ -56,51 +56,6 @@ def get_currencies_by_month(year: int, month: int, db: Session = Depends(get_db)
         extract('month', models.CurrencyRate.rate_date) == month
     ).all()
 
-def get_avg_stats(query_filter, db: Session):
-    stats = db.query(
-        models.CurrencyRate.currency_code,
-        models.CurrencyRate.currency_name,
-        func.avg(models.CurrencyRate.exchange_rate).label('avg_rate'),
-        func.min(models.CurrencyRate.exchange_rate).label('min_rate'),
-        func.max(models.CurrencyRate.exchange_rate).label('max_rate')
-    ).filter(*query_filter).group_by(
-        models.CurrencyRate.currency_code, 
-        models.CurrencyRate.currency_name
-    ).all()
-    
-    return [
-        {
-            "currency_code": s.currency_code,
-            "currency_name": s.currency_name,
-            "average_rate": round(s.avg_rate, 4),
-            "min_rate": s.min_rate,
-            "max_rate": s.max_rate
-        } for s in stats
-    ]
-
-@app.get("/api/currencies/avg/year/{year}")
-def get_avg_by_year(year: int, db: Session = Depends(get_db)):
-    filters = [extract('year', models.CurrencyRate.rate_date) == year]
-    return get_avg_stats(filters, db)
-
-@app.get("/api/currencies/avg/quarter/{year}/{quarter}")
-def get_avg_by_quarter(year: int, quarter: int, db: Session = Depends(get_db)):
-    start_month = (quarter - 1) * 3 + 1
-    end_month = start_month + 2
-    filters = [
-        extract('year', models.CurrencyRate.rate_date) == year,
-        extract('month', models.CurrencyRate.rate_date).between(start_month, end_month)
-    ]
-    return get_avg_stats(filters, db)
-
-@app.get("/api/currencies/avg/month/{year}/{month}")
-def get_avg_by_month(year: int, month: int, db: Session = Depends(get_db)):
-    filters = [
-        extract('year', models.CurrencyRate.rate_date) == year,
-        extract('month', models.CurrencyRate.rate_date) == month
-    ]
-    return get_avg_stats(filters, db)
-
 @app.post("/api/currencies/fetch")
 def fetch_currencies(target_date: str, db: Session = Depends(get_db)):
     try:
