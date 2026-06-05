@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from database import get_db, engine
 import models
 from nbp_service import fetch_rates_from_nbp
 
+models.Base.metadata.create_all(bind=engine)
 app = FastAPI(title="NBP Currency API")
 
 @app.post("/currencies/fetch")
