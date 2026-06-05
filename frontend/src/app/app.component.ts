@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CurrencyService } from './services/currency.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +11,6 @@ import { forkJoin } from 'rxjs';
 export class AppComponent implements OnInit {
 
   title = 'Kursy walut NBP';
-  allCurrencies: any[] = []; 
   filteredCurrencies: any[] = []; 
   activeTab: string = 'day'; 
 
@@ -26,20 +25,7 @@ export class AppComponent implements OnInit {
   constructor(private currencyService: CurrencyService) {}
 
   ngOnInit(): void {
-    this.loadAllCurrencies();
-  }
-
-  loadAllCurrencies(): void {
-    this.currencyService.getAvailableCurrencies().subscribe({
-      next: (data) => {
-        this.allCurrencies = data;
-        this.applyFilters(); 
-      },
-      error: (err) => {
-        this.message = 'Błąd podczas ładowania danych z bazy!';
-        this.isError = true;
-      }
-    });
+    this.applyFilters();
   }
 
   setTab(tab: string): void {
@@ -95,46 +81,41 @@ export class AppComponent implements OnInit {
       next: () => {
         this.message = 'Dane zostały pomyślnie zaktualizowane!';
         this.isError = false;
-        this.loadAllCurrencies();
+        this.applyFilters();
       },
       error: () => {
-        this.message = 'Zakończono pobieranie pakietu danych (dni wolne zostały automatycznie pominięte).';
+        this.message = 'Zakończono pobieranie pakietu danych.';
         this.isError = false;
-        this.loadAllCurrencies();
+        this.applyFilters();
       }
     });
   }
 
   applyFilters(): void {
-    this.filteredCurrencies = this.allCurrencies.filter(item => {
-      if (this.activeTab === 'all') {
-        return true;
-      }
+    let request$: Observable<any[]>;
 
-      const dateParts = item.rate_date.split('-'); 
-      const year = dateParts[0];
-      const month = dateParts[1];
-      
-      const monthInt = parseInt(month, 10);
-      let quarter = '';
-      if (monthInt >= 1 && monthInt <= 3) quarter = 'Q1';
-      else if (monthInt >= 4 && monthInt <= 6) quarter = 'Q2';
-      else if (monthInt >= 7 && monthInt <= 9) quarter = 'Q3';
-      else if (monthInt >= 10 && monthInt <= 12) quarter = 'Q4';
+    if (this.activeTab === 'all') {
+      request$ = this.currencyService.getAvailableCurrencies();
+    } else if (this.activeTab === 'day') {
+      request$ = this.currencyService.getCurrenciesByDate(this.selectedDate);
+    } else if (this.activeTab === 'month') {
+      request$ = this.currencyService.getCurrenciesByMonth(this.selectedYear, this.selectedMonth);
+    } else if (this.activeTab === 'quarter') {
+      request$ = this.currencyService.getCurrenciesByQuarter(this.selectedYear, this.selectedQuarter);
+    } else if (this.activeTab === 'year') {
+      request$ = this.currencyService.getCurrenciesByYear(this.selectedYear);
+    } else {
+      return;
+    }
 
-      if (this.activeTab === 'day') {
-        return item.rate_date === this.selectedDate;
+    request$.subscribe({
+      next: (data) => {
+        this.filteredCurrencies = data;
+      },
+      error: () => {
+        this.message = 'Błąd podczas pobierania przefiltrowanych danych z bazy!';
+        this.isError = true;
       }
-      if (this.activeTab === 'month') {
-        return year === this.selectedYear && month === this.selectedMonth;
-      }
-      if (this.activeTab === 'quarter') {
-        return year === this.selectedYear && quarter === this.selectedQuarter;
-      }
-      if (this.activeTab === 'year') {
-        return year === this.selectedYear;
-      }
-      return true;
     });
   }
 }
