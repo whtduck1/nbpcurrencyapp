@@ -1,47 +1,121 @@
-<div class="app-container">
-  <h1>{{ title }}</h1>
-  <p class="subtitle">System zarządzania kursami walut z API NBP</p>
+<div class="app-background">
+  <div class="app-container">
+    
+    <header class="app-header">
+      <h1>{{ title }}</h1>
+      <p class="subtitle">Wybierz zakres dat, kliknij Pobierz i wyświetl</p>
+    </header>
 
-  <div class="control-panel">
-    <div class="form-group">
-      <label for="rate-date">Wybierz datę:</label>
-      <input type="date" id="rate-date" [(ngModel)]="selectedDate" class="date-input">
+    <div class="tabs-container">
+      <button [class.active]="activeTab === 'day'" (click)="setTab('day')">Dzień</button>
+      <button [class.active]="activeTab === 'month'" (click)="setTab('month')">Miesiąc</button>
+      <button [class.active]="activeTab === 'quarter'" (click)="setTab('quarter')">Kwartał</button>
+      <button [class.active]="activeTab === 'year'" (click)="setTab('year')">Rok</button>
+      <button [class.active]="activeTab === 'all'" (click)="setTab('all')">Wszystko</button>
     </div>
 
-    <div class="button-group">
-      <button (click)="fetchFromNbp()" class="btn btn-fetch">Pobierz z NBP i Zapisz</button>
-      <button (click)="filterByDate()" class="btn btn-filter">Pokaz z bazy dla daty</button>
-      <button (click)="loadAllCurrencies()" class="btn btn-all">Pokaż całą bazę</button>
+    <div class="control-card">
+      <div class="form-inputs">
+        
+        <div *ngIf="activeTab === 'day'" class="input-wrapper">
+          <label class="input-label">Wybierz datę</label>
+          <input type="date" [(ngModel)]="selectedDate" (change)="applyFilters()" class="modern-input">
+        </div>
+
+        <div *ngIf="activeTab === 'month'" class="row-inputs">
+          <div class="input-wrapper">
+            <label class="input-label">Rok</label>
+            <select [(ngModel)]="selectedYear" (change)="applyFilters()" class="modern-input">
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+            </select>
+          </div>
+          <div class="input-wrapper">
+            <label class="input-label">Miesiąc</label>
+            <select [(ngModel)]="selectedMonth" (change)="applyFilters()" class="modern-input">
+              <option value="01">Styczeń</option>
+              <option value="02">Luty</option>
+              <option value="03">Marzec</option>
+              <option value="04">Kwiecień</option>
+              <option value="05">Maj</option>
+              <option value="06">Czerwiec</option>
+              <option value="07">Lipiec</option>
+              <option value="08">Sierpień</option>
+              <option value="09">Wrzesień</option>
+              <option value="10">Październik</option>
+              <option value="11">Listopad</option>
+              <option value="12">Grudzień</option>
+            </select>
+          </div>
+        </div>
+
+        <div *ngIf="activeTab === 'quarter'" class="row-inputs">
+          <div class="input-wrapper">
+            <label class="input-label">Rok</label>
+            <select [(ngModel)]="selectedYear" (change)="applyFilters()" class="modern-input">
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+            </select>
+          </div>
+          <div class="input-wrapper">
+            <label class="input-label">Kwartał</label>
+            <select [(ngModel)]="selectedQuarter" (change)="applyFilters()" class="modern-input">
+              <option value="Q1">I Kwartał (Q1)</option>
+              <option value="Q2">II Kwartał (Q2)</option>
+              <option value="Q3">III Kwartał (Q3)</option>
+              <option value="Q4">IV Kwartał (Q4)</option>
+            </select>
+          </div>
+        </div>
+
+        <div *ngIf="activeTab === 'year'" class="input-wrapper">
+          <label class="input-label">Rok</label>
+          <select [(ngModel)]="selectedYear" (change)="applyFilters()" class="modern-input">
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+          </select>
+        </div>
+
+        <div *ngIf="activeTab === 'all'" class="info-badge">
+          ℹ️ Wyświetlanie pełnej listy bez filtrów czasowych
+        </div>
+
+      </div>
+
+      <button *ngIf="activeTab !== 'all'" (click)="fetchAndLoad()" class="btn-modern">
+        Pobierz z NBP
+      </button>
     </div>
-  </div>
 
-  <div *ngIf="message" [ngClass]="{'alert-error': isError, 'alert-success': !isError}" class="alert-box">
-    {{ message }}
-  </div>
+    <div *ngIf="message" [ngClass]="{'alert-error': isError, 'alert-success': !isError}" class="alert-box">
+      {{ message }}
+    </div>
 
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Kod waluty</th>
-          <th>Nazwa waluty</th>
-          <th>Kurs wymiany (PLN)</th>
-          <th>Data kursu</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of currencies">
-          <td>{{ item.id }}</td>
-          <td class="bold-code">{{ item.currency_code }}</td>
-          <td>{{ item.currency_name }}</td>
-          <td class="rate-val">{{ item.exchange_rate | number:'1.4-4' }}</td>
-          <td>{{ item.rate_date }}</td>
-        </tr>
-        <tr *ngIf="currencies.length === 0">
-          <td colspan="5" class="no-data">Brak danych do wyświetlenia. Wybierz datę i pobierz kursy.</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-card">
+      <table class="clean-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Kod waluty</th>
+            <th>Nazwa waluty</th>
+            <th class="text-right">Kurs wymiany</th>
+            <th>Data kursu</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filteredCurrencies" class="table-row">
+            <td class="text-muted">{{ item.id }}</td>
+            <td><span class="currency-tag">{{ item.currency_code }}</span></td>
+            <td class="currency-name">{{ item.currency_name }}</td>
+            <td class="rate-val text-right">{{ item.exchange_rate | number:'1.4-4' }} PLN</td>
+            <td class="text-muted">{{ item.rate_date }}</td>
+          </tr>
+          <tr *ngIf="filteredCurrencies.length === 0">
+            <td colspan="5" class="no-data">Brak danych do wyświetlenia. Użyj panelu powyżej, aby pobrać dane.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </div>

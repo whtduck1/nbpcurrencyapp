@@ -1,59 +1,116 @@
-$primary-color: #2563eb;
-$success-color: #16a34a;
-$error-color: #dc2626;
+$primary-color: #4f46e5;
+$text-main: #1e293b;
+$text-sub: #64748b;
 $bg-color: #f8fafc;
-$text-color: #1e293b;
 $border-color: #e2e8f0;
 
+.app-background {
+  background-color: $bg-color;
+  min-height: 100vh;
+  padding: 3rem 1rem;
+  box-sizing: border-box;
+}
+
 .app-container {
-  max-width: 1000px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: $text-color;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: $text-main;
 
-  h1 {
-    font-size: 2.2rem;
-    color: #0f172a;
-    margin-bottom: 0.2rem;
+  .app-header {
     text-align: center;
+    margin-bottom: 2rem;
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 0.5rem 0;
+    }
+    .subtitle {
+      margin: 0;
+      color: $text-sub;
+      font-size: 1rem;
+    }
   }
 
-  .subtitle {
-    text-align: center;
-    color: #64748b;
-    margin-bottom: 2.5rem;
-    font-size: 1.1rem;
+  .tabs-container {
+    display: flex;
+    background: #eed;
+    background: #e2e8f0;
+    padding: 0.3rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    gap: 0.2rem;
+
+    button {
+      flex: 1;
+      padding: 0.6rem;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: $text-sub;
+      transition: all 0.2s;
+
+      &:hover {
+        color: $text-main;
+      }
+
+      &.active {
+        background: white;
+        color: $primary-color;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+    }
   }
 
-  .control-panel {
+  .control-card {
     background: white;
     padding: 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid $border-color;
     display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+    justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: 2rem;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
 
-    .form-group {
+    .form-inputs {
+      flex-grow: 1;
+    }
+
+    .row-inputs {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .input-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.4rem;
+      flex: 1;
 
-      label {
+      .input-label {
+        font-size: 0.85rem;
         font-weight: 600;
-        font-size: 0.9rem;
-        color: #475569;
+        color: $text-sub;
       }
 
-      .date-input {
-        padding: 0.6rem 1rem;
+      .modern-input {
+        width: 100%;
+        padding: 0.6rem 0.75rem;
         border: 1px solid $border-color;
         border-radius: 6px;
-        font-size: 1rem;
+        font-size: 0.95rem;
         outline: none;
+        box-sizing: border-box;
+        font-family: inherit;
+        background-color: #ffffff;
         transition: border-color 0.2s;
 
         &:focus {
@@ -62,120 +119,106 @@ $border-color: #e2e8f0;
       }
     }
 
-    .button-group {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
+    .info-badge {
+      font-size: 0.95rem;
+      color: $text-sub;
+      background: $bg-color;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      width: fit-content;
+    }
 
-      .btn {
-        padding: 0.65rem 1.25rem;
-        border: none;
-        border-radius: 6px;
-        font-size: 0.95rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
+    .btn-modern {
+      padding: 0.65rem 1.5rem;
+      background-color: $primary-color;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
 
-        &:hover {
-          transform: translateY(-1px);
-          filter: brightness(0.9);
-        }
-
-        &-fetch {
-          background-color: $success-color;
-          color: white;
-        }
-
-        &-filter {
-          background-color: $primary-color;
-          color: white;
-        }
-
-        &-all {
-          background-color: #64748b;
-          color: white;
-        }
+      &:hover {
+        background-color: #4338ca;
       }
     }
   }
 
   .alert-box {
-    padding: 1rem;
+    padding: 0.75rem 1.25rem;
     border-radius: 8px;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
     font-weight: 500;
-    font-size: 0.95rem;
     text-align: center;
   }
+  .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+  .alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
 
-  .alert-success {
-    background-color: #f0fdf4;
-    color: #15803d;
-    border: 1px solid #bbf7d0;
-  }
-
-  .alert-error {
-    background-color: #fef2f2;
-    color: #b91c1c;
-    border: 1px solid #fca5a5;
-  }
-
-  // Tabela z danymi
-  .table-container {
+  .table-card {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid $border-color;
     overflow: hidden;
-
-    table {
+    
+    .clean-table {
       width: 100%;
       border-collapse: collapse;
-      text-align: left;
+      
+      th {
+        background: #f8fafc;
+        padding: 0.9rem 1.25rem;
+        text-align: left;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $text-sub;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid $border-color;
+      }
+      
+      td {
+        padding: 0.9rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.95rem;
+      }
 
-      thead {
-        background-color: #f1f5f9;
-        
-        th {
-          padding: 1rem;
-          font-weight: 600;
-          color: #475569;
-          border-bottom: 2px solid $border-color;
+      .table-row {
+        transition: background 0.15s;
+        &:hover {
+          background-color: #f8fafc;
+        }
+        &:last-child td {
+          border-bottom: none;
         }
       }
 
-      tbody {
-        tr {
-          border-bottom: 1px solid $border-color;
-          transition: background-color 0.1s;
-
-          &:hover {
-            background-color: #f8fafc;
-          }
-
-          td {
-            padding: 1rem;
-            font-size: 0.95rem;
-          }
-
-          .bold-code {
-            font-weight: 700;
-            color: #334155;
-          }
-
-          .rate-val {
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: 600;
-            color: #0f172a;
-          }
-
-          .no-data {
-            text-align: center;
-            color: #94a3b8;
-            padding: 3rem;
-            font-style: italic;
-          }
-        }
+      .currency-tag {
+        background: #eff6ff;
+        color: #1d4ed8;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 0.8rem;
       }
+
+      .currency-name {
+        color: #334155;
+        font-weight: 500;
+      }
+
+      .rate-val {
+        font-family: monospace;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .text-muted { color: #94a3b8; }
+      .text-right { text-align: right; }
+      .no-data { text-align: center; color: #94a3b8; padding: 4rem 2rem; font-style: italic; }
     }
   }
 }
